@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FitCar — L'Auto per il Tuo Budget</title>
+<meta name="description" content="Non comprare la tua prossima auto alla cieca. Affidati a Fitcar: troviamo per te le migliori offerte sul mercato e ti garantiamo le condizioni d'acquisto più vantaggiose.">
+<meta name="keywords" content="acquisto auto, broker auto, consulenza automobilistica, migliori offerte auto, risparmio acquisto auto, fitcar auto">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@300;400;500;600;700&family=Barlow+Condensed:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="icon" type="image/png" href="favicon.png">
+  
+<style>
+  :root {
+    --black: #080808;
+    --dark: #111111;
+    --dark2: #1a1a1a;
+    --grey: #222222;
+    --grey2: #333333;
+    --grey-mid: #555;
+    --grey-light: #999;
+    --red: #c8102e;
+    --red-bright: #e8152f;
+    --red-dark: #8b0d20;
+    --white: #f5f5f5;
+    --white-dim: #cccccc;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+    input[type="radio"], input[type="checkbox"] { accent-color: #c8102e; }
+
+
+  html { scroll-behavior: smooth; overflow-x: hidden; max-width: 100%;}
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'Barlow', sans-serif;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CUSTOM CURSOR */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--red);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transition: transform 0.1s ease;
+    mix-blend-mode: normal;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1.5px solid rgba(200,16,46,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transition: all 0.15s ease;
+  }
+  body:hover .cursor { opacity: 1; }
+
+  /* NOISE TEXTURE OVERLAY */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 9990;
+    opacity: 0.35;
+  }
+
+  /* =================== HEADER / NAV =================== */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 1000;
+    padding: 20px 60px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(to bottom, rgba(8,8,8,0.95), transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(200,16,46,0.1);
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+  }
+
+
+  .nav-links {
+    display: flex;
+    gap: 40px;
+    list-style: none;
+  }
+  .nav-links a {
+    color: var(--grey-light);
+    text-decoration: none;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.85rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .nav-links a:hover { color: var(--red); }
+
+  .nav-cta {
+    background: var(--red);
+    color: var(--white) !important;
+    padding: 10px 24px;
+    border-radius: 2px;
+    font-weight: 600 !important;
+    transition: background 0.3s !important;
+  }
+  .nav-cta:hover { background: var(--red-bright) !important; color: var(--white) !important; }
+
+  /* =================== HERO =================== */
+  #hero {
+    position: relative;
+    height: 100vh;
+    min-height: 600px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 100px 10% 60px;
+    overflow: hidden;
+  }
+
+  #canvas-3d {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    opacity: 0.7;
+  }
+
+  .hero-eyebrow {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 24px;
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.3s;
+  }
+  .hero-eyebrow::before {
+    content: '';
+    display: inline-block;
+    width: 32px; height: 1px;
+    background: var(--red);
+    vertical-align: middle;
+    margin-right: 12px;
+  }
+
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(4rem, 10vw, 9rem);
+    line-height: 0.9;
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.5s;
+  }
+  .hero-title .line2 { color: var(--red); display: block; }
+  .hero-title .stroke {
+    -webkit-text-stroke: 1px rgba(255,255,255,0.3);
+    color: transparent;
+    display: block;
+  }
+
+  .hero-sub {
+    margin-top: 32px;
+    font-size: 1.1rem;
+    color: var(--white-dim);
+    font-weight: 300;
+    line-height: 1.7;
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.7s;
+    text-align: justify;
+  }
+
+  .hero-actions {
+    margin-top: 48px;
+    display: flex;
+    gap: 20px;
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    animation: fadeUp 0.8s ease forwards 0.9s;
+  }
+
+  .btn-primary {
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 18px 44px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: none;
+    text-decoration: none;
+    display: inline-block;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s, transform 0.2s;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+  .btn-primary::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,0.08);
+    transform: translateX(-100%);
+    transition: transform 0.3s;
+  }
+  .btn-primary:hover::after { transform: translateX(0); }
+  .btn-primary:hover { background: var(--red-bright); transform: translateY(-2px); }
+
+  .btn-ghost {
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--white-dim);
+    padding: 18px 44px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 600;
+    cursor: none;
+    text-decoration: none;
+    display: inline-block;
+    transition: border-color 0.3s, color 0.3s, transform 0.2s;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+  }
+  .btn-ghost:hover {
+    border-color: var(--red);
+    color: var(--red);
+    transform: translateY(-2px);
+  }
+
+  .hero-scroll-hint {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    color: var(--grey-mid);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    z-index: 2;
+    animation: bounce 2s infinite;
+  }
+  .scroll-line {
+    width: 1px; height: 48px;
+    background: linear-gradient(to bottom, var(--red), transparent);
+  }
+
+  /* =================== SECTION BASE =================== */
+  section { padding: 120px 10%; }
+
+  .section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--red);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::before {
+    content: '';
+    width: 24px; height: 1px;
+    background: var(--red);
+  }
+
+  .section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(3rem, 6vw, 5.5rem);
+    line-height: 0.95;
+    margin-bottom: 60px;
+  }
+
+  /* =================== COME FUNZIONA =================== */
+  #come-funziona { background: var(--dark); }
+
+  .steps-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2px;
+    margin-top: 60px;
+  }
+
+  .step-card {
+    background: var(--grey);
+    padding: 48px 36px;
+    position: relative;
+    overflow: hidden;
+    transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    cursor: none;
+  }
+  .step-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(90deg, var(--red-dark), var(--red));
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .step-card:hover::before { transform: scaleX(1); }
+  .step-card:hover { transform: translateY(-8px); }
+
+  .step-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 5rem;
+    color: rgba(200,16,46,0.08);
+    position: absolute;
+    top: 16px; right: 24px;
+    line-height: 1;
+    transition: color 0.4s;
+  }
+  .step-card:hover .step-num { color: rgba(200,16,46,0.18); }
+
+  .step-icon {
+    width: 48px; height: 48px;
+    margin-bottom: 24px;
+    color: var(--red);
+  }
+
+  .step-card h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.4rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+    color: var(--white);
+  }
+
+  .step-card p {
+    font-size: 0.9rem;
+    color: var(--grey-light);
+    line-height: 1.7;
+    font-weight: 300;
+  }
+
+  /* =================== VANTAGGI =================== */
+  #vantaggi {
+    background: var(--black);
+    position: relative;
+    overflow: hidden;
+  }
+  #vantaggi::before {
+    content: 'VANTAGGI';
+    position: absolute;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18vw;
+    color: rgba(255,255,255,0.02);
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    white-space: nowrap;
+    pointer-events: none;
+  }
+
+  .vantaggi-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: start;
+  }
+  .vantaggi-right-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .vantaggi-visual {
+    position: relative;
+    aspect-ratio: 4/3;
+    background: var(--grey);
+    overflow: hidden;
+  }
+  .vantaggi-visual-inner {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, var(--grey2) 0%, var(--dark2) 50%, #1c0508 100%);
+  }
+  .vantaggi-badge {
+    position: absolute;
+    bottom: 32px; left: 32px;
+    background: var(--red);
+    padding: 16px 24px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.2rem;
+    line-height: 1;
+    clip-path: polygon(6px 0%, 100% 0%, calc(100% - 6px) 100%, 0% 100%);
+  }
+  .vantaggi-badge span {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    display: block;
+    opacity: 0.8;
+  }
+  .vantaggi-line {
+    position: absolute;
+    top: 0; right: 0;
+    width: 4px; height: 100%;
+    background: linear-gradient(to bottom, transparent, var(--red), transparent);
+  }
+
+  /* Customer photo in vantaggi visual */
+  .vantaggi-photo {
+    position: absolute;
+    inset: 0;
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    opacity: 0.55;
+    mix-blend-mode: luminosity;
+    filter: grayscale(30%) contrast(1.1);
+  }
+  .vantaggi-photo-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(8,8,8,0.3) 0%, rgba(139,13,32,0.25) 100%);
+    z-index: 1;
+  }
+  .vantaggi-badge { z-index: 2; }
+  .vantaggi-line { z-index: 2; }
+  .car-silhouette { display: none; }
+
+  .vantaggi-list { list-style: none; display: flex; flex-direction: column; gap: 0; }
+  .vantaggio-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 24px;
+    padding: 28px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: all 0.3s;
+    cursor: none;
+  }
+  .vantaggio-item:hover { padding-left: 12px; }
+  .vantaggio-item:last-child { border-bottom: none; }
+
+  .vantaggio-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    color: var(--red);
+    min-width: 36px;
+    line-height: 1;
+    padding-top: 2px;
+  }
+
+  .vantaggio-text h4 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    color: var(--white);
+  }
+
+  .vantaggio-text p {
+    font-size: 0.88rem;
+    color: var(--grey-light);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  /* =================== CTA BAND =================== */
+  .cta-band {
+    background: var(--red);
+    padding: 80px 10%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 48px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cta-band::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 40px,
+      rgba(0,0,0,0.05) 40px,
+      rgba(0,0,0,0.05) 80px
+    );
+  }
+  .cta-band-text h2 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(2.5rem, 5vw, 4.5rem);
+    line-height: 0.95;
+    position: relative;
+  }
+  .cta-band-text p {
+    font-size: 1rem;
+    opacity: 0.85;
+    margin-top: 12px;
+    font-weight: 300;
+    position: relative;
+  }
+  .cta-band .btn-white {
+    background: var(--white);
+    color: var(--red);
+    border: none;
+    padding: 18px 48px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 700;
+    cursor: none;
+    text-decoration: none;
+    display: inline-block;
+    white-space: nowrap;
+    position: relative;
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .cta-band .btn-white:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.3); }
+
+  /* =================== FALSI MITI =================== */
+  #falsi-miti { background: var(--dark); }
+
+  .miti-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    margin-top: 60px;
+  }
+
+  .mito-card {
+    background: var(--grey2);
+    padding: 40px 32px;
+    border: 1px solid rgba(255,255,255,0.04);
+    position: relative;
+    overflow: hidden;
+    transition: border-color 0.4s, transform 0.4s;
+    cursor: none;
+  }
+  .mito-card:hover { border-color: rgba(200,16,46,0.3); transform: translateY(-6px); }
+
+  .mito-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(200,16,46,0.12);
+    border: 1px solid rgba(200,16,46,0.25);
+    color: var(--red);
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+  .mito-tag::before { content: '✕'; font-size: 0.8rem; }
+
+  .mito-card h3 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1.25rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--white-dim);
+    margin-bottom: 16px;
+    text-decoration: line-through;
+    text-decoration-color: var(--red);
+    text-decoration-thickness: 1px;
+  }
+
+  .mito-reality {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .mito-reality .check {
+    color: #4CAF50;
+    font-size: 1rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .mito-reality p {
+    font-size: 0.88rem;
+    color: var(--grey-light);
+    line-height: 1.65;
+    font-weight: 300;
+  }
+
+  .mito-card p.mito-myth {
+    font-size: 0.88rem;
+    color: rgba(204,204,204,0.5);
+    line-height: 1.65;
+    font-style: italic;
+  }
+
+  /* =================== FORM =================== */
+  #form-section {
+    background: var(--black);
+    position: relative;
+    overflow: hidden;
+  }
+  #form-section::after {
+    content: '';
+    position: absolute;
+    top: -200px; right: -200px;
+    width: 600px; height: 600px;
+    background: radial-gradient(circle, rgba(200,16,46,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .form-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.4fr;
+    gap: 80px;
+    align-items: start;
+  }
+
+  .form-intro { position: sticky; top: 120px; }
+
+  .form-intro .section-title { margin-bottom: 24px; }
+
+  .form-intro p {
+    font-size: 1rem;
+    color: var(--grey-light);
+    line-height: 1.7;
+    font-weight: 300;
+    margin-bottom: 40px;
+  }
+
+  .form-promise {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  .promise-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.95rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--white-dim);
+    font-weight: 500;
+  }
+  .promise-dot {
+    width: 8px; height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  /* THE FORM */
+  .elite-form {
+    background: var(--dark2);
+    border: 1px solid rgba(255,255,255,0.06);
+    padding: 56px 48px;
+    position: relative;
+  }
+  .elite-form::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 60px; height: 3px;
+    background: var(--red);
+  }
+
+  .form-section-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.5rem;
+    letter-spacing: 3px;
+    color: var(--red);
+    margin-bottom: 28px;
+    margin-top: 36px;
+    padding-top: 36px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+  }
+  .form-section-title:first-of-type { margin-top: 0; padding-top: 0; border-top: none; }
+
+  .form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+  .form-grid.single { grid-template-columns: 1fr; }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .form-group.full { grid-column: 1 / -1; }
+
+  .form-group label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.72rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--grey-light);
+    font-weight: 600;
+  }
+
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: var(--white);
+    padding: 14px 18px;
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 400;
+    outline: none;
+    transition: border-color 0.3s, background 0.3s;
+    cursor: none;
+    appearance: none;
+    -webkit-appearance: none;
+    border-radius: 0;
+    width: 100%;
+  }
+  .form-group select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23c8102e' stroke-width='1.5' fill='none'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 12px;
+    padding-right: 44px;
+    background-color: rgba(255,255,255,0.04);
+  }
+  .form-group select option { background: var(--grey2); color: var(--white); }
+  .form-group textarea { resize: vertical; min-height: 100px; }
+
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    border-color: var(--red);
+    background: rgba(200,16,46,0.05);
+  }
+  .form-group input::placeholder,
+  .form-group textarea::placeholder { color: var(--grey-mid); }
+
+  .radio-group {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .radio-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: none;
+  }
+  .radio-option input[type="radio"] {
+    width: 18px; height: 18px;
+    accent-color: var(--red);
+    cursor: none;
+    padding: 0;
+    flex-shrink: 0;
+  }
+  .radio-option label {
+    font-family: 'Barlow', sans-serif;
+    font-size: 0.9rem;
+    letter-spacing: 0;
+    text-transform: none;
+    color: var(--white-dim);
+    font-weight: 400;
+    cursor: none;
+  }
+
+  .privacy-note {
+    font-size: 0.78rem;
+    color: var(--grey-mid);
+    line-height: 1.6;
+    margin-top: 24px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .privacy-note input[type="checkbox"] {
+    width: 16px; height: 16px;
+    accent-color: var(--red);
+    margin-top: 2px;
+    flex-shrink: 0;
+    cursor: none;
+  }
+
+  .submit-btn {
+    margin-top: 32px;
+    width: 100%;
+    background: var(--red);
+    color: var(--white);
+    border: none;
+    padding: 20px;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.4rem;
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    cursor: none;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.3s, transform 0.2s;
+    clip-path: polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  }
+  .submit-btn::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+    transform: translateX(-100%);
+    transition: transform 0.5s;
+  }
+  .submit-btn:hover::after { transform: translateX(100%); }
+  .submit-btn:hover { background: var(--red-bright); transform: translateY(-2px); }
+  .submit-btn:disabled { opacity: 0.5; }
+
+  /* Success / Error messages */
+  .form-message {
+    display: none;
+    padding: 20px 24px;
+    margin-top: 24px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    font-weight: 600;
+    border-left: 3px solid;
+  }
+  .form-message.success {
+    background: rgba(76,175,80,0.08);
+    border-color: #4CAF50;
+    color: #4CAF50;
+    display: block;
+  }
+  .form-message.error {
+    background: rgba(200,16,46,0.08);
+    border-color: var(--red);
+    color: var(--red);
+    display: block;
+  }
+
+  /* =================== FOOTER =================== */
+  footer {
+    background: var(--dark);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    padding: 48px 0;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    align-items: center;
+    gap: 0;
+    text-align: left;
+    max-width: 1400px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+  footer-wrap {
+    background: var(--dark);
+    border-top: 1px solid rgba(255,255,255,0.05);
+    width: 100%;
+  }
+  .footer-col-logo {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+  .footer-col-center { text-align: center; }
+  .footer-col-right { text-align: center; }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.5rem;
+    letter-spacing: 4px;
+  }
+  .footer-logo span { color: var(--red); }
+  .footer-center { text-align: center; }
+  .footer-note {
+    font-size: 0.78rem;
+    color: var(--grey-mid);
+    line-height: 1.6;
+  }
+  .footer-right { text-align: right; }
+  .footer-links {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .footer-links a {
+    color: var(--grey-light);
+    text-decoration: none;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: color 0.3s;
+  }
+  .footer-links a:hover { color: var(--red); }
+
+  /* =================== ANIMATIONS =================== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes bounce {
+    0%, 100% { transform: translateX(-50%) translateY(0); }
+    50% { transform: translateX(-50%) translateY(8px); }
+  }
+  @keyframes pulse-red {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(200,16,46,0.4); }
+    50% { box-shadow: 0 0 0 12px rgba(200,16,46,0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: opacity 0.7s ease, transform 0.7s ease;
+  }
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Red glow line divider */
+  .glow-divider {
+    width: 100%;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--red), transparent);
+    margin: 0;
+  }
+
+  /* =================== RESPONSIVE =================== */
+  @media (max-width: 1024px) {
+    nav { padding: 20px 32px; }
+    section { padding: 80px 6%; }
+    .steps-grid { grid-template-columns: repeat(2, 1fr); }
+    .miti-grid { grid-template-columns: repeat(2, 1fr); }
+    .vantaggi-layout { grid-template-columns: 1fr; gap: 40px; }
+    .form-layout { grid-template-columns: 1fr; gap: 40px; }
+    .form-intro { position: static; }
+    footer { grid-template-columns: 1fr; text-align: center; padding: 40px 24px; }
+    .footer-col-logo { align-items: center; text-align: center; }
+    .footer-col-logo img { margin: 0 auto; display: block; }
+    .footer-col-center { text-align: center; }
+    .footer-col-right { text-align: center; }
+    .footer-links { align-items: center; display: flex; flex-direction: column; gap: 12px; }
+    .footer-links a { text-align: center; }
+  }
+  @media (max-width: 768px) {
+    nav { padding: 16px 20px; }
+    .nav-links { display: none; }
+    section { padding: 60px 5%; }
+    #hero { padding-top: 100px !important; padding-bottom: 60px !important; padding-left: 6% !important; padding-right: 6% !important; }
+    .steps-grid { grid-template-columns: 1fr; }
+    .miti-grid { grid-template-columns: 1fr; }
+    .form-grid { grid-template-columns: 1fr; }
+    .elite-form { padding: 32px 24px; }
+    .cta-band { flex-direction: column; text-align: center; }
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+    footer { grid-template-columns: 1fr !important; padding: 36px 20px !important; gap: 28px !important; }
+    .footer-col-logo, .footer-col-center, .footer-col-right { text-align: center !important; }
+    .footer-col-logo img { margin: 0 auto !important; display: block !important; }
+    .footer-links { align-items: center !important; flex-direction: column !important; }
+  }
+100% { transform: translateX(-50%); }
+  }
+
+  /* ---- MARQUEE BAR ---- */
+  .marquee-bar {
+    background: var(--black);
+    border-top: 1.5px solid var(--red);
+    border-bottom: 1.5px solid var(--red);
+    overflow: hidden;
+    white-space: nowrap;
+    padding: 0;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    position: relative;
+    z-index: 10;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+  .marquee-track {
+    display: inline-flex;
+    align-items: center;
+    animation: marquee-scroll 28s linear infinite;
+    will-change: transform;
+  }
+  .marquee-track:hover { animation-play-state: paused; }
+  .marquee-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 20px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.88);
+    white-space: nowrap;
+    line-height: 40px;
+  }
+  .marquee-sep {
+    display: inline-block;
+    color: var(--red);
+    font-size: 1rem;
+    padding: 0 4px;
+    opacity: 0.8;
+    line-height: 40px;
+  }
+  .marquee-brand {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 1.05rem;
+    letter-spacing: 5px;
+    color: #fff;
+    padding: 0 20px;
+    line-height: 40px;
+  }
+  @keyframes marquee-scroll {
+    0%   { transform: translateX(0); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .vantaggi-badge-below {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 20px;
+    padding: 18px 24px;
+    background: var(--red);
+    clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%);
+    align-self: flex-start;
+  }
+  .badge-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 2.8rem;
+    color: #fff;
+    line-height: 1;
+  }
+  .badge-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.8rem;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.85);
+    font-weight: 600;
+    line-height: 1.3;
+  }
+  /* Rimuovi vecchio stile badge assoluto */
+  .vantaggi-badge { display: none; }
+  
+  .radio-option input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border: 2px solid #555;
+  border-radius: 2px;
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: border-color 0.2s, background 0.2s;
+}
+.radio-option input[type="radio"]:checked {
+  border-color: #c8102e;
+  background: #c8102e;
+  box-shadow: inset 0 0 0 3px #111;
+}
+.radio-option input[type="radio"]:hover {
+  border-color: #c8102e;
+}
+
+.credits{
+  text-decoration: none !important;
+  color: #c8102e !important;
+}
+</style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- =================== NAV =================== -->
+<nav>
+  <div class="logo">
+    <img src="logo.png" alt="FitCar" style="height:46px;width:auto;display:block;">
+  </div>
+  <ul class="nav-links">
+    <li><a href="#come-funziona">Come Funziona</a></li>
+    <li><a href="#vantaggi">Vantaggi</a></li>
+    <li><a href="#falsi-miti">Falsi Miti</a></li>
+    <li><a href="#form-section" class="nav-cta">Richiedi Ora</a></li>
+  </ul>
+</nav>
+
+</div>
+
+<!-- =================== COME FUNZIONA =================== -->
+<section id="come-funziona">
+  <div class="section-label">Termini & Condizioni</div>
+  <h2 class="section-title reveal">DEL <span style="color:var(--red)">SERVIZIO</span></h2>
+
+   <p class="hero-sub">
+    1. Titolare del servizio<br>
+Il presente sito web e servizio denominato "FitCar" è gestito da: BTHEE di Russo Gabriele con sede legale in Via Mario Pagano 47, 71121 Foggia (FG), Partita IVA: 04472720715.
+<br><br>
+2. Oggetto del servizio<br>
+FitCar offre un servizio di intermediazione e consulenza finalizzato all’acquisto di autoveicoli.<br>
+In particolare, il servizio comprende:<br>
+- raccolta delle richieste dell’utente<br>
+- analisi delle esigenze<br>
+- ricerca di veicoli presso fornitori terzi<br>
+- proposta commerciale personalizzata<br>
+- eventuale gestione dell’acquisto per conto del cliente<br><br>
+
+FitCar non opera come concessionario né come venditore diretto al pubblico.<br>
+
+3. Modalità di accesso al servizio<br>
+L’utente accede al servizio compilando un form online inserendo:<br>
+- dati personali<br>
+- preferenze relative al veicolo<br><br>
+
+Con l’invio del form, l’utente:<br>
+- autorizza il contatto commerciale<br>
+- dichiara che i dati forniti sono veritieri<br><br>
+
+4. Natura del rapporto<br>
+L’invio del form:<br>
+- non costituisce contratto di acquisto<br>
+- non comporta obblighi per l’utente<br>
+- rappresenta esclusivamente una richiesta di contatto<br>
+
+Eventuali accordi successivi saranno formalizzati separatamente.<br><br>
+
+5. Mandato all’acquisto (eventuale)<br>
+Nel caso in cui il cliente decida di procedere, potrà conferire a FitCar un mandato per:<br>
+- individuare e acquistare il veicolo<br>
+- gestire le pratiche amministrative<br><br>
+
+Il mandato sarà regolato da accordo scritto separato.<br>
+
+6. Modalità di acquisto e intestazione<br>
+Il veicolo può essere:<br>
+- acquistato direttamente dal cliente<br>
+- oppure acquistato da FitCar per conto del cliente<br><br>
+
+In quest’ultimo caso:<br>
+- il veicolo potrà essere intestato temporaneamente alla ditta<br>
+- seguirà successivo passaggio di proprietà al cliente<br><br>
+
+7. Prezzi e condizioni economiche<br>
+Eventuali costi del servizio, commissioni o margini saranno:<br>
+- comunicati preventivamente<br>
+- accettati dal cliente prima della conclusione dell’operazione<br><br>
+
+8. Responsabilità<br>
+FitCar:<br>
+- non garantisce la disponibilità dei veicoli<br>
+- non è responsabile per variazioni di prezzo o condizioni<br>
+- non è responsabile per informazioni fornite da terzi<br><br>
+
+Il cliente è tenuto a verificare la documentazione fornita prima dell’acquisto.<br>
+
+9. Limitazione di responsabilità<br>
+FitCar non è responsabile per:<br>
+- difetti del veicolo non dichiarati dal fornitore<br>
+- utilizzo improprio del veicolo<br>
+- ritardi imputabili a terzi<br>
+- problematiche successive al trasferimento di proprietà<br><br>
+
+10. Garanzie<br>
+Le eventuali garanzie sui veicoli:<br>
+- sono fornite dal venditore terzo o concessionario<br>
+- non sono direttamente imputabili a FitCar, salvo diverso accordo scritto<br><br>
+
+11. Diritto di recesso<br>
+Il diritto di recesso si applica esclusivamente ai contratti eventualmente conclusi a distanza, nei limiti previsti dalla normativa vigente.<br>
+Non si applica alla semplice richiesta di contatto.<br><br>
+
+12. Trattamento dei dati personali<br>
+I dati raccolti:<br>
+- sono utilizzati per finalità commerciali e di consulenza<br>
+- sono trattati nel rispetto del Regolamento UE 2016/679 (GDPR)<br><br>
+
+13. Clausola di manleva<br>
+L’utente si impegna a manlevare FitCar da qualsiasi responsabilità derivante da:<br>
+- uso scorretto delle informazioni ricevute<br>
+- dichiarazioni false o incomplete<br><br>
+
+14. Proprietà intellettuale<br>
+Tutti i contenuti del sito sono protetti e non possono essere utilizzati senza autorizzazione.<br>
+
+15. Legge applicabile e foro competente<br>
+Il presente documento è regolato dalla legge italiana.<br>
+Per ogni controversia è competente il foro del luogo di residenza o domicilio del consumatore, se previsto dalla legge.<br></p>
+
+  
+</section>
+
+<!-- =================== FOOTER =================== -->
+<div style="background:var(--dark);border-top:1px solid rgba(255,255,255,0.05);width:100%;">
+<footer>
+  <div class="footer-col-logo">
+    <img src="data:image/png;base64,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" alt="FitCar" style="height:36px;width:auto;display:block;margin:0 auto 8px;opacity:0.88;">
+    <p style="font-size:0.72rem;color:var(--grey-mid);font-family:'Barlow Condensed',sans-serif;letter-spacing:2px;text-transform:uppercase;">L'auto per il tuo budget</p>
+  </div>
+  <div class="footer-col-center">
+    <p class="footer-note">
+      © 2026 FITCAR<br>
+      P.IVA 04472720715<br>
+      Disegnato e Sviluppato da <a href="https://www.moockup.it" class="credits"><strong>MOOCKUP STUDIO</strong></a>
+    </p>
+  </div>
+  <div class="footer-col-right">
+    <div class="footer-links">
+      <a href="#">Privacy Policy</a>
+      <a href="#">Cookie Policy</a>
+      <a href="#">Termini di Servizio</a>
+      <a href="mailto:info@fitcar.it?subject=Voglio lavorare con FitCar">Lavora con noi</a>
+    </div>
+  </div>
+</footer>
+</div>
+
+
+<!-- =================== SCRIPTS =================== -->
+<script>
+/* ---- CURSOR ---- */
+const cursor = document.getElementById('cursor');
+const cursorRing = document.getElementById('cursorRing');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', function(e) {
+  mx = e.clientX;
+  my = e.clientY;
+  cursor.style.left = (mx - 6) + 'px';
+  cursor.style.top  = (my - 6) + 'px';
+});
+
+function animRing() {
+  rx += (mx - rx - 18) * 0.12;
+  ry += (my - ry - 18) * 0.12;
+  cursorRing.style.left = rx + 'px';
+  cursorRing.style.top  = ry + 'px';
+  requestAnimationFrame(animRing);
+}
+animRing();
+
+document.querySelectorAll('a, button, .step-card, .mito-card, .vantaggio-item').forEach(function(el) {
+  el.addEventListener('mouseenter', function() {
+    cursor.style.transform = 'scale(1.8)';
+    cursorRing.style.transform = 'scale(1.4)';
+    cursorRing.style.borderColor = 'rgba(200,16,46,0.9)';
+  });
+  el.addEventListener('mouseleave', function() {
+    cursor.style.transform = 'scale(1)';
+    cursorRing.style.transform = 'scale(1)';
+    cursorRing.style.borderColor = 'rgba(200,16,46,0.5)';
+  });
+});
+
+/* ---- THREE.JS 3D BACKGROUND ---- */
+(function() {
+  var canvas = document.getElementById('canvas-3d');
+  window.__initThree = function(THREE) {
+    var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setClearColor(0x000000, 0);
+
+    var scene  = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+    camera.position.set(0, 0, 30);
+
+    var pCount    = 1800;
+    var positions = new Float32Array(pCount * 3);
+    for (var i = 0; i < pCount; i++) {
+      positions[i * 3]     = (Math.random() - 0.5) * 80;
+      positions[i * 3 + 1] = (Math.random() - 0.5) * 60;
+      positions[i * 3 + 2] = (Math.random() - 0.5) * 60;
+    }
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+    var mat = new THREE.PointsMaterial({ color: 0xc8102e, size: 0.18, transparent: true, opacity: 0.5, sizeAttenuation: true });
+    var particles = new THREE.Points(geo, mat);
+    scene.add(particles);
+
+    var lineMat = new THREE.LineBasicMaterial({ color: 0x1a0508, transparent: true, opacity: 0.5 });
+    for (var li = 0; li < 12; li++) {
+      var pts = [ new THREE.Vector3(-60, -30 + li * 5.5, -20), new THREE.Vector3(60, -30 + li * 5.5, -20) ];
+      scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), lineMat));
+    }
+    for (var ci = 0; ci < 16; ci++) {
+      var pts2 = [ new THREE.Vector3(-60 + ci * 8, -30, -20), new THREE.Vector3(-60 + ci * 8, 30, -20) ];
+      scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts2), lineMat));
+    }
+
+    for (var ri = 0; ri < 3; ri++) {
+      var rg   = new THREE.RingGeometry(6 + ri * 5, 6 + ri * 5 + 0.05, 64);
+      var rm   = new THREE.MeshBasicMaterial({ color: 0xc8102e, transparent: true, opacity: 0.06 - ri * 0.015, side: THREE.DoubleSide });
+      var ring3 = new THREE.Mesh(rg, rm);
+      ring3.rotation.x = Math.PI / 2;
+      ring3.position.y = -8;
+      scene.add(ring3);
+    }
+
+    var mouseX3 = 0, mouseY3 = 0;
+    document.addEventListener('mousemove', function(e) {
+      mouseX3 = (e.clientX / window.innerWidth  - 0.5) * 2;
+      mouseY3 = (e.clientY / window.innerHeight - 0.5) * 2;
+    });
+
+    var t = 0;
+    function animate() {
+      t += 0.003;
+      particles.rotation.y = t * 0.08 + mouseX3 * 0.05;
+      particles.rotation.x = mouseY3 * 0.03;
+      camera.position.x += (mouseX3 * 2  - camera.position.x) * 0.02;
+      camera.position.y += (-mouseY3 * 1.5 - camera.position.y) * 0.02;
+      camera.lookAt(scene.position);
+      renderer.render(scene, camera);
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    window.addEventListener('resize', function() {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  };
+})();
+
+/* ---- SCROLL REVEAL ---- */
+var reveals = document.querySelectorAll('.reveal');
+var revealObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(entry) {
+    if (entry.isIntersecting) entry.target.classList.add('visible');
+  });
+}, { threshold: 0.1 });
+reveals.forEach(function(el) { revealObserver.observe(el); });
+
+/* ---- NAV SCROLL EFFECT ---- */
+var nav = document.querySelector('nav');
+window.addEventListener('scroll', function() {
+  if (window.scrollY > 80) {
+    nav.style.background      = 'rgba(8,8,8,0.97)';
+    nav.style.borderBottomColor = 'rgba(200,16,46,0.2)';
+  } else {
+    nav.style.background      = 'linear-gradient(to bottom, rgba(8,8,8,0.95), transparent)';
+    nav.style.borderBottomColor = 'rgba(200,16,46,0.1)';
+  }
+});
+
+/* ---- PERMUTA TOGGLE ---- */
+function togglePermuta(show) {
+  var d = document.getElementById('permuta-details');
+  if (show) {
+    d.style.display    = 'block';
+    d.style.gridColumn = '1 / -1';
+  } else {
+    d.style.display = 'none';
+  }
+}
+
+/* ---- COUNTER ANIMATION ---- */
+function animateCounter(el, target, suffix) {
+  var cur = 0;
+  var inc = target / 60;
+  var timer = setInterval(function() {
+    cur += inc;
+    if (cur >= target) { cur = target; clearInterval(timer); }
+    el.textContent = Math.floor(cur) + suffix;
+  }, 25);
+}
+
+var statNums = document.querySelectorAll('.stat-num');
+var statsObserver = new IntersectionObserver(function(entries) {
+  entries.forEach(function(e) {
+    if (e.isIntersecting) {
+      var t = e.target.textContent;
+      if (t.indexOf('99')  !== -1) animateCounter(e.target, 99,  '%');
+      if (t.indexOf('72')  !== -1) animateCounter(e.target, 72,  'h');
+      statsObserver.unobserve(e.target);
+    }
+  });
+}, { threshold: 0.5 });
+statNums.forEach(function(n) { statsObserver.observe(n); });
+
+/* ---- FORM SUBMIT → GOOGLE APPS SCRIPT ---- */
+var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzAjbhM3FDB9oARrQS4A6qo6P3tYGRO3DylZx4JPDkNV9td-fHvVKhn9D1NqTzWqvmEfg/exec';
+
+document.getElementById('autoForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  var form = this;
+  var btn  = document.getElementById('submitBtn');
+  var msg  = document.getElementById('formMessage');
+
+  // Validazione
+  var required = form.querySelectorAll('[required]');
+  var valid = true;
+  required.forEach(function(f) {
+    var empty = !f.value || (f.type === 'checkbox' && !f.checked);
+    f.style.borderColor = empty ? 'var(--red)' : '';
+    if (empty) valid = false;
+  });
+  if (!valid) {
+    msg.className   = 'form-message error';
+    msg.textContent = '⚠ Compila tutti i campi obbligatori per proseguire.';
+    msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
+
+  btn.disabled    = true;
+  btn.textContent = 'Invio in corso...';
+  msg.className   = 'form-message';
+  msg.textContent = '';
+
+  var payload = {
+    timestamp:      new Date().toLocaleString('it-IT'),
+    nome:           form.nome.value.trim(),
+    cognome:        form.cognome.value.trim(),
+    telefono:       form.telefono.value.trim(),
+    email:          form.email.value.trim(),
+    citta:          form.citta.value.trim(),
+    auto:           form.auto.value.trim(),
+    alimentazione:  form.alimentazione.value,
+    cambio:         form.cambio.value,
+    budget_min:     form.budget_min.value,
+    budget_max:     form.budget_max.value,
+    condizione:     (form.condizione && form.condizione.value) ? form.condizione.value : 'Indifferente',
+    permuta:        form.permuta.value,
+    auto_permuta:   (form['auto_permuta'] && form['auto_permuta'].value) ? form['auto_permuta'].value.trim() : '—',
+    valore_permuta: (form['valore_permuta'] && form['valore_permuta'].value) ? form['valore_permuta'].value.trim() : '—',
+    note:           form.note.value.trim() || '—'
+  };
+
+  fetch(GOOGLE_SCRIPT_URL, {
+    method:  'POST',
+    mode:    'no-cors',
+    headers: { 'Content-Type': 'application/json' },
+    body:    JSON.stringify(payload)
+  }).then(function() {
+    msg.className = 'form-message success';
+    msg.innerHTML = '✓ Richiesta inviata! Ti contatteremo entro 24 ore.';
+    form.reset();
+    var pd = document.getElementById('permuta-details');
+    if (pd) pd.style.display = 'none';
+  }).catch(function(err) {
+    msg.className = 'form-message error';
+    msg.innerHTML = '⚠ Errore di rete. Scrivici a <a href="mailto:moockupstudio@gmail.com" style="color:var(--red)">moockupstudio@gmail.com</a>';
+    console.error(err);
+  }).finally(function() {
+    btn.textContent = 'Invia Richiesta Gratuita';
+    btn.disabled    = false;
+    msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  });
+});
+</script>
+
+<script type="module">
+  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.module.js';
+  if (window.__initThree) window.__initThree(THREE);
+</script>
+</body>
+</html>
