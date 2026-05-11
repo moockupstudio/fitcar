@@ -1916,28 +1916,30 @@ _iub.cons_instructions.push(["submit"]);
 </script>
 
 <script type="text/javascript">
-  _iub.cons_instructions.push(["load", {
-    form: {
-      selector: document.getElementById("autoForm"),
-      map: {
-        subject: {
-          full_name: "nome",
-          email: "email"
-        },
-        preferences: {
-          privacy: "privacy"
+  document.addEventListener("DOMContentLoaded", function() {
+    _iub.cons_instructions.push(["load", {
+      form: {
+        selector: document.getElementById("autoForm"),
+        map: {
+          subject: {
+            full_name: "nome",
+            email: "email"
+          },
+          preferences: {
+            privacy: "privacy"
+          }
         }
+      },
+      consent: {
+        legal_notices: [
+          { identifier: "privacy_policy" },
+          { identifier: "cookie_policy" },
+          { identifier: "terms" }
+        ]
       }
-    },
-    consent: {
-      legal_notices: [
-        { identifier: "privacy_policy" },
-        { identifier: "cookie_policy" },
-        { identifier: "terms" }
-      ]
-    }
-  }])
-</script>  
+    }])
+  });
+</script>
 
 </body>
 </html>
