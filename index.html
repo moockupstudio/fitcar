@@ -1831,16 +1831,31 @@ document.getElementById('autoForm').addEventListener('submit', function(e) {
   var btn  = document.getElementById('submitBtn');
   var msg  = document.getElementById('formMessage');
 
-  // Validazione
+  // 1. Valida tutti i campi required
   var required = form.querySelectorAll('[required]');
   var valid = true;
   required.forEach(function(f) {
     var empty = !f.value || (f.type === 'checkbox' && !f.checked);
-    f.style.borderColor = empty ? 'var(--red)' : '';
+    f.style.borderColor = empty ? '#c8102e' : '';
     if (empty) valid = false;
   });
+
+  // 2. Blocca se privacy non accettata
+  var privacy = document.getElementById('privacy');
+  if (!privacy.checked) {
+    privacy.style.outline = '2px solid #c8102e';
+    msg.className = 'form-message error';
+    msg.style.display = 'block';
+    msg.textContent = '⚠ Devi accettare la Privacy Policy per continuare.';
+    msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  } else {
+    privacy.style.outline = '';
+  }
+
   if (!valid) {
-    msg.className   = 'form-message error';
+    msg.className = 'form-message error';
+    msg.style.display = 'block';
     msg.textContent = '⚠ Compila tutti i campi obbligatori per proseguire.';
     msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
@@ -1848,8 +1863,7 @@ document.getElementById('autoForm').addEventListener('submit', function(e) {
 
   btn.disabled    = true;
   btn.textContent = 'Invio in corso...';
-  msg.className   = 'form-message';
-  msg.textContent = '';
+  msg.style.display = 'none';
 
   var payload = {
     timestamp:      new Date().toLocaleString('it-IT'),
@@ -1870,21 +1884,41 @@ document.getElementById('autoForm').addEventListener('submit', function(e) {
     note:           form.note.value.trim() || '—'
   };
 
-  fetch(GOOGLE_SCRIPT_URL, {
+  // 3. Invia a Iubenda il consenso manualmente
+  if (window._iub && window._iub.cons) {
+    window._iub.cons.sendData({
+      subject: {
+        full_name: payload.nome + ' ' + payload.cognome,
+        email: payload.email
+      },
+      preferences: {
+        privacy: true
+      },
+      legal_notices: [
+        { identifier: 'privacy_policy' },
+        { identifier: 'cookie_policy' },
+        { identifier: 'terms' }
+      ]
+    });
+  }
+
+  // 4. Invia a Google Sheets
+  fetch('https://script.google.com/macros/s/AKfycbzAjbhM3FDB9oARrQS4A6qo6P3tYGRO3DylZx4JPDkNV9td-fHvVKhn9D1NqTzWqvmEfg/exec', {
     method:  'POST',
     mode:    'no-cors',
     headers: { 'Content-Type': 'application/json' },
     body:    JSON.stringify(payload)
   }).then(function() {
     msg.className = 'form-message success';
+    msg.style.display = 'block';
     msg.innerHTML = '✓ Richiesta inviata! Ti contatteremo entro 24 ore.';
     form.reset();
     var pd = document.getElementById('permuta-details');
     if (pd) pd.style.display = 'none';
   }).catch(function(err) {
     msg.className = 'form-message error';
-    msg.innerHTML = '⚠ Errore di rete. Scrivici a <a href="mailto:moockupstudio@gmail.com" style="color:var(--red)">moockupstudio@gmail.com</a>';
-    console.error(err);
+    msg.style.display = 'block';
+    msg.innerHTML = '⚠ Errore di rete. Scrivici a <a href="mailto:info@fitcar.it" style="color:#c8102e">info@fitcar.it</a>';
   }).finally(function() {
     btn.textContent = 'Invia Richiesta Gratuita';
     btn.disabled    = false;
@@ -1899,8 +1933,6 @@ document.getElementById('autoForm').addEventListener('submit', function(e) {
 </script>
 <script type="text/javascript">
   _iub.cons_instructions.push(["load", {
-    submitElement: document.getElementById("submitBtn"),
-    redirectUrl: false,
     form: {
       selector: document.getElementById("autoForm"),
       map: {
