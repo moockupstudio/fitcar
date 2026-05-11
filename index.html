@@ -1884,13 +1884,14 @@ function inviaForm() {
 // 3. Invia consenso a Iubenda (sincrono)
 _iub.cons_instructions.push(["submit"]);
 
-  // 4. Invia a Google Sheets + mail
+// 4. Invia a Google Sheets + mail
   fetch('https://script.google.com/macros/s/AKfycbzAjbhM3FDB9oARrQS4A6qo6P3tYGRO3DylZx4JPDkNV9td-fHvVKhn9D1NqTzWqvmEfg/exec', {
     method:  'POST',
     mode:    'no-cors',
     headers: { 'Content-Type': 'application/json' },
     body:    JSON.stringify(payload)
   }).then(function() {
+    try { _iub.cons_instructions.push(["submit"]); } catch(e) {}
     msg.className = 'form-message success';
     msg.style.display = 'block';
     msg.innerHTML = '✓ Richiesta inviata! Ti contatteremo entro 24 ore.';
