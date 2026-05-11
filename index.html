@@ -1619,7 +1619,7 @@
             <span>Ho letto e accetto la <a href="https://www.iubenda.com/privacy-policy/44022269" style="color:var(--red); text-decoration:none;">Privacy Policy</a>. Acconsento al trattamento dei dati personali per ricevere informazioni commerciali da FitCar. *</span>
           </label>
 
-          <button type="submit" class="submit-btn" id="submitBtn">
+          <button type="button" class="submit-btn" id="submitBtn" onclick="inviaForm()">
             Invia Richiesta Gratuita
           </button>
 
@@ -1825,22 +1825,12 @@ statNums.forEach(function(n) { statsObserver.observe(n); });
 /* ---- FORM SUBMIT → GOOGLE APPS SCRIPT ---- */
 var GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzAjbhM3FDB9oARrQS4A6qo6P3tYGRO3DylZx4JPDkNV9td-fHvVKhn9D1NqTzWqvmEfg/exec';
 
-document.getElementById('autoForm').addEventListener('submit', function(e) {
-  e.preventDefault();
-  var form = this;
+function inviaForm() {
+  var form = document.getElementById('autoForm');
   var btn  = document.getElementById('submitBtn');
   var msg  = document.getElementById('formMessage');
 
-  // 1. Valida tutti i campi required
-  var required = form.querySelectorAll('[required]');
-  var valid = true;
-  required.forEach(function(f) {
-    var empty = !f.value || (f.type === 'checkbox' && !f.checked);
-    f.style.borderColor = empty ? '#c8102e' : '';
-    if (empty) valid = false;
-  });
-
-  // 2. Blocca se privacy non accettata
+  // 1. Blocca se privacy non accettata
   var privacy = document.getElementById('privacy');
   if (!privacy.checked) {
     privacy.style.outline = '2px solid #c8102e';
@@ -1849,10 +1839,17 @@ document.getElementById('autoForm').addEventListener('submit', function(e) {
     msg.textContent = '⚠ Devi accettare la Privacy Policy per continuare.';
     msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
     return;
-  } else {
-    privacy.style.outline = '';
   }
+  privacy.style.outline = '';
 
+  // 2. Valida tutti i required
+  var required = form.querySelectorAll('[required]');
+  var valid = true;
+  required.forEach(function(f) {
+    var empty = !f.value || (f.type === 'checkbox' && !f.checked);
+    f.style.borderColor = empty ? '#c8102e' : '';
+    if (empty) valid = false;
+  });
   if (!valid) {
     msg.className = 'form-message error';
     msg.style.display = 'block';
@@ -1884,16 +1881,14 @@ document.getElementById('autoForm').addEventListener('submit', function(e) {
     note:           form.note.value.trim() || '—'
   };
 
-  // 3. Invia a Iubenda il consenso manualmente
+  // 3. Invia consenso a Iubenda
   if (window._iub && window._iub.cons) {
     window._iub.cons.sendData({
       subject: {
         full_name: payload.nome + ' ' + payload.cognome,
         email: payload.email
       },
-      preferences: {
-        privacy: true
-      },
+      preferences: { privacy: true },
       legal_notices: [
         { identifier: 'privacy_policy' },
         { identifier: 'cookie_policy' },
@@ -1902,7 +1897,7 @@ document.getElementById('autoForm').addEventListener('submit', function(e) {
     });
   }
 
-  // 4. Invia a Google Sheets
+  // 4. Invia a Google Sheets + mail
   fetch('https://script.google.com/macros/s/AKfycbzAjbhM3FDB9oARrQS4A6qo6P3tYGRO3DylZx4JPDkNV9td-fHvVKhn9D1NqTzWqvmEfg/exec', {
     method:  'POST',
     mode:    'no-cors',
@@ -1918,13 +1913,13 @@ document.getElementById('autoForm').addEventListener('submit', function(e) {
   }).catch(function(err) {
     msg.className = 'form-message error';
     msg.style.display = 'block';
-    msg.innerHTML = '⚠ Errore di rete. Scrivici a <a href="mailto:info@fitcar.it" style="color:#c8102e">info@fitcar.it</a>';
+    msg.innerHTML = '⚠ Errore di rete. Scrivici a <a href="mailto:moockupstudio@gmail.com" style="color:#c8102e">moockupstudio@gmail.com</a>';
   }).finally(function() {
     btn.textContent = 'Invia Richiesta Gratuita';
     btn.disabled    = false;
     msg.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
-});
+}
 </script>
 
 <script type="module">
