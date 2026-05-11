@@ -1889,7 +1889,29 @@ function inviaForm() {
     body:    JSON.stringify(payload)
   }).then(function() {
     // 4. Invia consenso a Iubenda solo se fetch ok
-    try { _iub.cons_instructions.push(["submit"]); } catch(e) {}
+    try {
+  _iub.cons_instructions.push(["submit", {
+    consent: {
+      subject: {
+        id: payload.email,
+        full_name: payload.nome + ' ' + payload.cognome,
+        email: payload.email
+      },
+      preferences: {
+        privacy: true
+      },
+      legal_notices: [
+        { identifier: "privacy_policy" },
+        { identifier: "cookie_policy" },
+        { identifier: "terms" }
+      ],
+      proofs: [{
+        content: JSON.stringify({ privacy_accepted: true }),
+        form: "FitCar - Richiesta Auto"
+      }]
+    }
+  }]);
+} catch(e) { console.warn('Iubenda error:', e); }
     msg.className = 'form-message success';
     msg.style.display = 'block';
     msg.innerHTML = '✓ Richiesta inviata! Ti contatteremo entro 24 ore.';
